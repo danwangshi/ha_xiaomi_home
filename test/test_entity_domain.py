@@ -14,6 +14,7 @@ from custom_components.xiaomi_home.miot.miot_device import (
 from custom_components.xiaomi_home.miot.miot_spec import (
     MIoTSpecAction,
     MIoTSpecEvent,
+    MIoTSpecInstance,
     MIoTSpecProperty,
     MIoTSpecService,
 )
@@ -26,6 +27,7 @@ def fake_device() -> SimpleNamespace:
         name="Test device",
         miot_client=SimpleNamespace(main_loop=None),
         gen_service_entity_id=Mock(return_value="switch.test"),
+        gen_device_entity_id=Mock(return_value="climate.test"),
         gen_prop_entity_id=Mock(return_value="select.test"),
         gen_event_entity_id=Mock(return_value="event.test"),
         gen_action_entity_id=Mock(return_value="button.test"),
@@ -69,6 +71,36 @@ def test_entity_id_normalizes_platform_and_description() -> None:
     device.gen_service_entity_id.assert_called_once_with(
         "switch", siid=2, description="test_service"
     )
+    assert entity._attr_unique_id == "xiaomi_home.test"
+
+
+def test_service_entity_preserves_legacy_unique_id() -> None:
+    """Preserve a service unique ID when its description is slugified."""
+    device = fake_device()
+    device.gen_service_entity_id.return_value = (
+        "light.mxiang_cn_test_moc001_s_16_white_light"
+    )
+    service = fake_service()
+    service.iid = 16
+    service.description = "White Light"
+
+    entity = MIoTServiceEntity(device, MIoTEntityData("light", service))
+
+    assert entity._attr_unique_id == (
+        "xiaomi_home.mxiang_cn_test_moc001_s_16_White Light"
+    )
+
+
+def test_device_entity_keeps_unique_id_without_service_iid() -> None:
+    """Keep device-level entities on the non-service unique ID path."""
+    device = fake_device()
+    instance = MIoTSpecInstance(
+        urn="urn:test", name="air_conditioner", description="Air Conditioner",
+        description_trans="空调")
+
+    entity = MIoTServiceEntity(device, MIoTEntityData("climate", instance))
+
+    device.gen_device_entity_id.assert_called_once_with("climate")
     assert entity._attr_unique_id == "xiaomi_home.test"
 
 

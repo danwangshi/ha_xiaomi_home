@@ -119,6 +119,17 @@ HA_DOMAIN_MAP = {
 }
 
 
+def _gen_legacy_service_unique_id(
+    entity_id: str, siid: int, description: str
+) -> str:
+    """Keep the pre-slugified service unique ID during migration."""
+    object_id = entity_id.split('.', 1)[1]
+    marker = f'_s_{siid}_'
+    if marker in object_id:
+        object_id = object_id.split(marker, 1)[0] + marker + description
+    return f'{DOMAIN}.{object_id}'
+
+
 class MIoTEntityData:
     """MIoT Entity Data."""
     platform: str
@@ -960,7 +971,12 @@ class MIoTServiceEntity(Entity):
                 f'{self.entity_data.spec.description_trans}')
             self._attr_entity_category = entity_data.spec.entity_category
         # Set entity attr
-        self._attr_unique_id = f'{DOMAIN}.{self.entity_id.split(".", 1)[1]}'
+        if isinstance(self.entity_data.spec, MIoTSpecService):
+            self._attr_unique_id = _gen_legacy_service_unique_id(
+                self.entity_id, self.entity_data.spec.iid,
+                self.entity_data.spec.description)
+        else:
+            self._attr_unique_id = f'{DOMAIN}.{self.entity_id.split(".", 1)[1]}'
         self._attr_should_poll = False
         self._attr_has_entity_name = True
         self._attr_available = miot_device.online
