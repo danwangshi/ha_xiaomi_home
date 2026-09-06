@@ -5,6 +5,7 @@ from unittest.mock import Mock
 
 from custom_components.xiaomi_home.miot.miot_device import (
     MIoTActionEntity,
+    MIoTDevice,
     MIoTEntityData,
     MIoTEventEntity,
     MIoTPropertyEntity,
@@ -43,7 +44,22 @@ def fake_service() -> MIoTSpecService:
     return service
 
 
-def test_service_entity_uses_platform_domain() -> None:
+def test_entity_id_normalizes_platform_and_description() -> None:
+    """Normalize internal platforms and service descriptions for HA IDs."""
+    device = object.__new__(MIoTDevice)
+    device._model_strs = ["mxiang", "moc001"]
+    device._did = "test"
+    device.miot_client = SimpleNamespace(cloud_server="cn")
+
+    entity_id = device.gen_service_entity_id(
+        "air-conditioner", siid=2, description="Indicator Light"
+    )
+
+    assert entity_id.startswith("climate.")
+    assert "indicator_light" in entity_id
+    assert " " not in entity_id
+
+
     """A service entity uses its platform instead of the integration domain."""
     device = fake_device()
     service = fake_service()

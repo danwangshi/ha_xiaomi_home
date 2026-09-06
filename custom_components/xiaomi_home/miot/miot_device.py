@@ -107,6 +107,17 @@ from .miot_spec import (
 
 _LOGGER = logging.getLogger(__name__)
 
+HA_DOMAIN_MAP = {
+    'air-conditioner': 'climate',
+    'bath-heater': 'climate',
+    'dehumidifier': 'humidifier',
+    'electric-blanket': 'climate',
+    'heater': 'climate',
+    'television': 'media_player',
+    'thermostat': 'climate',
+    'wifi-speaker': 'media_player',
+}
+
 
 class MIoTEntityData:
     """MIoT Entity Data."""
@@ -344,15 +355,18 @@ class MIoTDevice:
             cloud_server=self.miot_client.cloud_server, did=self._did)
 
     def gen_device_entity_id(self, ha_domain: str) -> str:
+        ha_domain = HA_DOMAIN_MAP.get(ha_domain, ha_domain)
         return (
             f'{ha_domain}.{self._model_strs[0][:9]}_{self.did_tag}_'
             f'{self._model_strs[-1][:20]}')
 
     def gen_service_entity_id(self, ha_domain: str, siid: int,
                               description: str) -> str:
+        ha_domain = HA_DOMAIN_MAP.get(ha_domain, ha_domain)
         return (
             f'{ha_domain}.{self._model_strs[0][:9]}_{self.did_tag}_'
-            f'{self._model_strs[-1][:20]}_s_{siid}_{description}')
+            f'{self._model_strs[-1][:20]}_s_{siid}_'
+            f'{slugify_name(description)}')
 
     def gen_prop_entity_id(
         self, ha_domain: str, spec_name: str, siid: int, piid: int
