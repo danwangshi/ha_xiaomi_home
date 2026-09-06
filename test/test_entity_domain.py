@@ -48,11 +48,12 @@ def test_service_entity_uses_platform_domain() -> None:
     device = fake_device()
     service = fake_service()
 
-    MIoTServiceEntity(device, MIoTEntityData("switch", service))
+    entity = MIoTServiceEntity(device, MIoTEntityData("switch", service))
 
     device.gen_service_entity_id.assert_called_once_with(
         "switch", siid=2, description="test_service"
     )
+    assert entity._attr_unique_id == "xiaomi_home.test"
 
 
 def test_property_entity_uses_platform_domain() -> None:
@@ -69,11 +70,12 @@ def test_property_entity_uses_platform_domain() -> None:
     prop.value_range = None
     prop.value_list = None
 
-    MIoTPropertyEntity(device, prop)
+    entity = MIoTPropertyEntity(device, prop)
 
     device.gen_prop_entity_id.assert_called_once_with(
         ha_domain="select", spec_name="test_property", siid=2, piid=3
     )
+    assert entity._attr_unique_id == "xiaomi_home.test"
 
 
 def test_event_entity_uses_platform_domain() -> None:
@@ -95,11 +97,12 @@ def test_event_entity_uses_platform_domain() -> None:
     event.device_class = None
     event.argument = []
 
-    TestEventEntity(device, event)
+    entity = TestEventEntity(device, event)
 
     device.gen_event_entity_id.assert_called_once_with(
         ha_domain="event", spec_name="test_event", siid=2, eiid=4
     )
+    assert entity._attr_unique_id == "xiaomi_home.test"
 
 
 def test_action_entity_uses_platform_domain() -> None:
@@ -114,8 +117,9 @@ def test_action_entity_uses_platform_domain() -> None:
     action.platform = "button"
     action.device_class = None
 
-    MIoTActionEntity(device, action)
+    entity = MIoTActionEntity(device, action)
 
     device.gen_action_entity_id.assert_called_once_with(
         ha_domain="button", spec_name="test_action", siid=2, aiid=5
     )
+    assert entity._attr_unique_id == "xiaomi_home.test"

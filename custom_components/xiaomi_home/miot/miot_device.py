@@ -946,7 +946,7 @@ class MIoTServiceEntity(Entity):
                 f'{self.entity_data.spec.description_trans}')
             self._attr_entity_category = entity_data.spec.entity_category
         # Set entity attr
-        self._attr_unique_id = self.entity_id
+        self._attr_unique_id = f'{DOMAIN}.{self.entity_id.split(".", 1)[1]}'
         self._attr_should_poll = False
         self._attr_has_entity_name = True
         self._attr_available = miot_device.online
@@ -1245,7 +1245,7 @@ class MIoTPropertyEntity(Entity):
             ha_domain=spec.platform, spec_name=spec.name,
             siid=spec.service.iid, piid=spec.iid)
         # Set entity attr
-        self._attr_unique_id = self.entity_id
+        self._attr_unique_id = f'{DOMAIN}.{self.entity_id.split(".", 1)[1]}'
         self._attr_should_poll = False
         self._attr_has_entity_name = True
         self._attr_name = (
@@ -1387,7 +1387,7 @@ class MIoTEventEntity(Entity):
             ha_domain=spec.platform, spec_name=spec.name,
             siid=spec.service.iid,  eiid=spec.iid)
         # Set entity attr
-        self._attr_unique_id = self.entity_id
+        self._attr_unique_id = f'{DOMAIN}.{self.entity_id.split(".", 1)[1]}'
         self._attr_should_poll = False
         self._attr_has_entity_name = True
         self._attr_name = (
@@ -1498,7 +1498,7 @@ class MIoTActionEntity(Entity):
             ha_domain=spec.platform, spec_name=spec.name,
             siid=spec.service.iid, aiid=spec.iid)
         # Set entity attr
-        self._attr_unique_id = self.entity_id
+        self._attr_unique_id = f'{DOMAIN}.{self.entity_id.split(".", 1)[1]}'
         self._attr_should_poll = False
         self._attr_has_entity_name = True
         self._attr_name = (
