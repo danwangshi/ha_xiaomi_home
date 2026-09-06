@@ -934,11 +934,12 @@ class MIoTServiceEntity(Entity):
         self._value_sub_ids = {}
         # Gen entity id
         if isinstance(self.entity_data.spec, MIoTSpecInstance):
-            self.entity_id = miot_device.gen_device_entity_id(DOMAIN)
+            self.entity_id = miot_device.gen_device_entity_id(
+                entity_data.platform)
             self._attr_name = f' {self.entity_data.spec.description_trans}'
         elif isinstance(self.entity_data.spec, MIoTSpecService):
             self.entity_id = miot_device.gen_service_entity_id(
-                DOMAIN, siid=self.entity_data.spec.iid,
+                entity_data.platform, siid=self.entity_data.spec.iid,
                 description=self.entity_data.spec.description)
             self._attr_name = (
                 f'{"* "if self.entity_data.spec.proprietary else " "}'
@@ -1241,7 +1242,7 @@ class MIoTPropertyEntity(Entity):
         self._pending_write_ha_state_timer = None
         # Gen entity_id
         self.entity_id = self.miot_device.gen_prop_entity_id(
-            ha_domain=DOMAIN, spec_name=spec.name,
+            ha_domain=spec.platform, spec_name=spec.name,
             siid=spec.service.iid, piid=spec.iid)
         # Set entity attr
         self._attr_unique_id = self.entity_id
@@ -1383,7 +1384,7 @@ class MIoTEventEntity(Entity):
         self._main_loop = miot_device.miot_client.main_loop
         # Gen entity_id
         self.entity_id = self.miot_device.gen_event_entity_id(
-            ha_domain=DOMAIN, spec_name=spec.name,
+            ha_domain=spec.platform, spec_name=spec.name,
             siid=spec.service.iid,  eiid=spec.iid)
         # Set entity attr
         self._attr_unique_id = self.entity_id
@@ -1494,7 +1495,7 @@ class MIoTActionEntity(Entity):
         self._state_sub_id = 0
         # Gen entity_id
         self.entity_id = self.miot_device.gen_action_entity_id(
-            ha_domain=DOMAIN, spec_name=spec.name,
+            ha_domain=spec.platform, spec_name=spec.name,
             siid=spec.service.iid, aiid=spec.iid)
         # Set entity attr
         self._attr_unique_id = self.entity_id
